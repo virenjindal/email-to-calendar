@@ -12,7 +12,6 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.exceptions import RefreshError
-from google.apps import calendar_v3, gmail_v1
 from googleapiclient.discovery import build
 import anthropic
 
