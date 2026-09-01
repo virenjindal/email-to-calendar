@@ -7,7 +7,8 @@ Scans recent emails, uses Claude to extract tasks, creates calendar events
 import os
 import json
 import base64
-from datetime import datetime, timedelta
+import pytz
+from datetime import datetime, timedelta, timezone
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -166,8 +167,9 @@ def create_calendar_event(service, task):
         # Parse time
         time_str = task.get('time', '09:00')
         hour, minute = map(int, time_str.split(':'))
-        
-        start_time = event_date.replace(hour=hour, minute=minute)
+
+        eastern = pytz.timezone('America/New_York')
+        start_time = eastern.localize(event_date.replace(hour=hour, minute=minute))
         end_time = start_time + timedelta(hours=1)
         
         event = {
@@ -175,11 +177,9 @@ def create_calendar_event(service, task):
             'description': f"Task from email analysis (Priority: {task.get('priority', 'medium')})",
             'start': {
                 'dateTime': start_time.isoformat(),
-                'timeZone': 'America/New_York',
             },
             'end': {
                 'dateTime': end_time.isoformat(),
-                'timeZone': 'America/New_York',
             },
         }
         
