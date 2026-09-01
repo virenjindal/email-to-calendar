@@ -161,15 +161,21 @@ Return ONLY valid JSON, no other text."""
 def create_calendar_event(service, task):
     """Create a calendar event for a task"""
     try:
-        # Calculate event date
-        event_date = datetime.now() + timedelta(days=task.get('due_in_days', 0))
+        import pytz
+        
+        # Get current time in Eastern Time
+        eastern = pytz.timezone('America/New_York')
+        now = datetime.now(eastern)
+        
+        # Calculate event date in Eastern Time
+        event_date = now + timedelta(days=task.get('due_in_days', 0))
         
         # Parse time
         time_str = task.get('time', '09:00')
         hour, minute = map(int, time_str.split(':'))
-
-        eastern = pytz.timezone('America/New_York')
-        start_time = eastern.localize(event_date.replace(hour=hour, minute=minute))
+        
+        # Create event time in Eastern timezone
+        start_time = event_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
         end_time = start_time + timedelta(hours=1)
         
         event = {
@@ -177,9 +183,11 @@ def create_calendar_event(service, task):
             'description': f"Task from email analysis (Priority: {task.get('priority', 'medium')})",
             'start': {
                 'dateTime': start_time.isoformat(),
+                'timeZone': 'America/New_York',
             },
             'end': {
                 'dateTime': end_time.isoformat(),
+                'timeZone': 'America/New_York',
             },
         }
         
