@@ -1,0 +1,36 @@
+name: Email to Calendar
+
+on:
+  schedule:
+    # Run every day at 8:00 AM UTC (adjust timezone as needed)
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  scan-and-create:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-auth-oauthlib google-auth-httplib2 google-api-python-client anthropic
+      
+      - name: Run automation
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+          CALENDAR_TOKEN: ${{ secrets.CALENDAR_TOKEN }}
+        run: python gmail_to_calendar.py
+      
+      - name: Log execution
+        if: always()
+        run: echo "Email to Calendar automation executed at $(date)"
