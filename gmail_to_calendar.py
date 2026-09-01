@@ -175,11 +175,11 @@ def create_calendar_event(service, task):
             'description': f"Task from email analysis (Priority: {task.get('priority', 'medium')})",
             'start': {
                 'dateTime': start_time.isoformat(),
-                'timeZone': 'UTC',
+                'timeZone': 'America/New_York',
             },
             'end': {
                 'dateTime': end_time.isoformat(),
-                'timeZone': 'UTC',
+                'timeZone': 'America/New_York',
             },
         }
         
